@@ -1,4 +1,4 @@
-FROM maven:3.8-openjdk-17-alpine AS builder
+FROM openjdk:17-alpine AS builder
 WORKDIR /app
 COPY pom.xml ./
 RUN mvn dependency:go-offline -B && rm -rf /root/.m2/repository
