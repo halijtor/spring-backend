@@ -1,15 +1,14 @@
-FROM maven:3.8-openjdk-17-alpine AS builder
+# 1) build stage
+FROM maven:3.8.1-openjdk-17-slim AS builder
 WORKDIR /app
 COPY pom.xml ./
-RUN mvn dependency:go-offline -B && rm -rf /root/.m2/repository
 COPY src ./src
 RUN mvn package -DskipTests
 
-FROM openjdk:17-alpine
-RUN addgroup -S appuser && adduser -S appuser -G appuser
+# 2) runtime stage
+FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
-ENV JAVA_OPTS=""
-USER appuser
-ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
 
